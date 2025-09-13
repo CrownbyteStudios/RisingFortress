@@ -1,18 +1,36 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<title>Rising Fortress</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Rising Fortress</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>Rising Fortress</h1>
-<div id="resources">
-  Gold: <span id="gold">0</span> | Mana: <span id="mana">0</span>
-</div>
-<canvas id="gameCanvas" width="800" height="600"></canvas>
+  <h1>Rising Fortress</h1>
 
-<script type="module" src="firebase.js"></script>
-<script type="module" src="script.js"></script>
+  <!-- Ressourcen & Spielername -->
+  <div id="topbar">
+    <span id="playerName">---</span>
+    <div class="res">
+      <img src="assets/gold.png" class="icon"> <span id="gold">0</span>
+      <img src="assets/mana.png" class="icon"> <span id="mana">0</span>
+    </div>
+  </div>
+
+  <!-- Name-Eingabe beim ersten Login -->
+  <div id="nameForm" class="overlay" style="display:none;">
+    <div class="box">
+      <h2>Willkommen bei Rising Fortress</h2>
+      <p>Wähle deinen Spielernamen:</p>
+      <input type="text" id="nameInput" placeholder="Dein Name">
+      <button onclick="saveName()">Start</button>
+    </div>
+  </div>
+
+  <!-- Spielfeld -->
+  <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+  <script type="module" src="firebase.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
