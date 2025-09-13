@@ -1,45 +1,59 @@
+import { db, playerId, playerData } from "./firebase.js";
+import { doc, setDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-let gold = 100;
-let mana = 50;
-document.getElementById('gold').innerText = gold;
-document.getElementById('mana').innerText = mana;
+// Bilder laden
+const grass = new Image(); grass.src = "assets/grass.png";
+const base = new Image(); base.src = "assets/base.png";
 
-// Beispiel: Gebäude zum Platzieren
-let building = {x: 100, y: 100, width: 50, height: 50, color: "orange"};
+let building = {x: 200, y: 200, width: 80, height: 80};
 let isDragging = false;
 
-// Touch & Drag Events
-canvas.addEventListener('mousedown', (e) => { isDragging = true; building.x = e.offsetX - building.width/2; building.y = e.offsetY - building.height/2; draw(); });
-canvas.addEventListener('mousemove', (e) => { if(isDragging){ building.x = e.offsetX - building.width/2; building.y = e.offsetY - building.height/2; draw(); }});
+// --- Steuerung Maus ---
+canvas.addEventListener('mousedown', (e) => { 
+  isDragging = true; 
+  moveBuilding(e.offsetX, e.offsetY);
+});
+canvas.addEventListener('mousemove', (e) => { 
+  if(isDragging) moveBuilding(e.offsetX, e.offsetY);
+});
 canvas.addEventListener('mouseup', () => { isDragging = false; saveBuilding(); });
 
-canvas.addEventListener('touchstart', (e) => { e.preventDefault(); isDragging = true; building.x = e.touches[0].clientX - building.width/2; building.y = e.touches[0].clientY - building.height/2; draw(); });
-canvas.addEventListener('touchmove', (e) => { e.preventDefault(); if(isDragging){ building.x = e.touches[0].clientX - building.width/2; building.y = e.touches[0].clientY - building.height/2; draw(); }});
+// --- Steuerung Touch ---
+canvas.addEventListener('touchstart', (e) => { 
+  e.preventDefault(); 
+  isDragging = true; 
+  moveBuilding(e.touches[0].clientX, e.touches[0].clientY); 
+});
+canvas.addEventListener('touchmove', (e) => { 
+  e.preventDefault(); 
+  if(isDragging) moveBuilding(e.touches[0].clientX, e.touches[0].clientY); 
+});
 canvas.addEventListener('touchend', () => { isDragging = false; saveBuilding(); });
+
+// Gebäude bewegen
+function moveBuilding(x, y){
+  building.x = x - building.width/2;
+  building.y = y - building.height/2;
+  draw();
+}
 
 // Zeichnen
 function draw(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    ctx.fillStyle = building.color;
-    ctx.fillRect(building.x, building.y, building.width, building.height);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.drawImage(grass, 0, 0, canvas.width, canvas.height);
+  ctx.drawImage(base, building.x, building.y, building.width, building.height);
 }
 
-// Gebäude speichern in Firebase
-async function saveBuilding(){
-    if(typeof playerId === "undefined") return;
-    try{
-        await firebase.firestore().collection('players').doc(playerId).set({
-            buildingX: building.x,
-            buildingY: building.y,
-            gold: gold,
-            mana: mana
-        });
-        console.log("Gebäude gespeichert!");
-    } catch(e){
-        console.error(e);
-    }
+function saveBuilding(){
+  if(!playerId) return;
+  setDoc(doc(db, "players", playerId), {
+    ...playerData,
+    buildings: [{x: building.x, y: building.y}]
+  });
+  console.log("Gebäude gespeichert");
 }
 
-draw();
+grass.onload = () => draw();
