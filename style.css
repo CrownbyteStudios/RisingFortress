@@ -1,1 +1,17 @@
-A
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background-color: #222;
+  color: #fff;
+}
+
+#gameCanvas {
+  border: 2px solid #fff;
+  background-color: #333;
+  touch-action: none;
+}
+
+#resources {
+  margin-bottom: 10px;
+  font-size: 20px;
+}
